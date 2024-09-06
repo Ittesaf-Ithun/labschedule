@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Schedule</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+        select, button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Check Your Lab Schedule</h1>
+        <label for="year">Select Year:</label>
+        <select id="year" onchange="updateWeeks()">
+            <!-- Years will be dynamically generated -->
+        </select>
+
+        <label for="month">Select Month:</label>
+        <select id="month" onchange="updateWeeks()">
+            <!-- Months will be dynamically generated -->
+        </select>
+
+        <label for="week">Select Week:</label>
+        <select id="week">
+            <!-- Weeks will be dynamically generated -->
+        </select>
+
+        <p>Are you in the Odd or Even group?</p>
+        <button onclick="checkSchedule('odd')">Odd</button>
+        <button onclick="checkSchedule('even')">Even</button>
+
+        <h2 id="schedule"></h2>
+    </div>
+
+    <script>
+        const monthNames = ['September', 'October', 'November', 'December', 'January'];
+        const startYear = 2024;
+        const endYear = 2025;
+        const currentDate = new Date();
+
+        window.onload = function() {
+            populateYearDropdown();
+            populateMonthDropdown();
+            updateWeeks();
+        };
+
+        function populateYearDropdown() {
+            const yearDropdown = document.getElementById('year');
+            for (let year = startYear; year <= endYear; year++) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.text = year;
+                yearDropdown.appendChild(option);
+            }
+            yearDropdown.value = currentDate.getFullYear();
+        }
+
+        function populateMonthDropdown() {
+            const monthDropdown = document.getElementById('month');
+            monthNames.forEach((month, index) => {
+                const option = document.createElement('option');
+                option.value = index + 8; // Starting from September (8th month in 0-indexed Date object)
+                option.text = month;
+                monthDropdown.appendChild(option);
+            });
+            monthDropdown.value = currentDate.getMonth(); // Set the current month as default
+        }
+
+        function updateWeeks() {
+            const year = parseInt(document.getElementById('year').value);
+            const month = parseInt(document.getElementById('month').value);
+
+            const weekDropdown = document.getElementById('week');
+            weekDropdown.innerHTML = ''; // Clear previous options
+
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const numWeeks = Math.ceil(daysInMonth / 7);
+
+            for (let week = 1; week <= numWeeks; week++) {
+                const option = document.createElement('option');
+                option.value = week;
+                option.text = `Week ${week}`;
+                weekDropdown.appendChild(option);
+            }
+        }
+
+        function checkSchedule(group) {
+            const month = parseInt(document.getElementById('month').value);
+            const week = parseInt(document.getElementById('week').value);
+
+            // Calculate the consistent days
+            const consistentDay = group === 'odd' ? 'Tuesday' : 'Thursday';
+
+            // Calculate the alternating days (Monday and Friday)
+            const isOddWeek = week % 2 !== 0;
+            let mondayClass = '';
+            let fridayClass = '';
+
+            if (isOddWeek) {
+                mondayClass = group === 'even' ? 'Yes' : 'No';
+                fridayClass = group === 'odd' ? 'Yes' : 'No';
+            } else {
+                mondayClass = group === 'odd' ? 'Yes' : 'No';
+                fridayClass = group === 'even' ? 'Yes' : 'No';
+            }
+
+            const scheduleText = `
+                Your lab schedule for Week ${week} of ${monthNames[month - 8]} ${document.getElementById('year').value}:
+                <ul>
+                    <li>${consistentDay}: Yes</li>
+                    <li>Monday: ${mondayClass}</li>
+                    <li>Friday: ${fridayClass}</li>
+                </ul>
+            `;
+
+            document.getElementById('schedule').innerHTML = scheduleText;
+        }
+    </script>
+</body>
+</html>
