@@ -3,135 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab Schedule</title>
+    <title>Class Schedule</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            margin: 50px;
             text-align: center;
-            margin-top: 50px;
         }
-        .container {
-            max-width: 600px;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
         }
-        select, button {
-            margin: 10px;
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
             padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .highlight {
+            background-color: yellow;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
             font-size: 16px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Check Your Lab Schedule</h1>
-        <label for="year">Select Year:</label>
-        <select id="year" onchange="updateWeeks()">
-            <!-- Years will be dynamically generated -->
-        </select>
 
-        <label for="month">Select Month:</label>
-        <select id="month" onchange="updateWeeks()">
-            <!-- Months will be dynamically generated -->
-        </select>
+    <h1>Class Schedule</h1>
+    <p id="current-date"></p>
 
-        <label for="week">Select Week:</label>
-        <select id="week">
-            <!-- Weeks will be dynamically generated -->
-        </select>
+    <p>Select your group:</p>
+    <button onclick="highlightSchedule('odd')">Odd</button>
+    <button onclick="highlightSchedule('even')">Even</button>
 
-        <p>Are you in the Odd or Even group?</p>
-        <button onclick="checkSchedule('odd')">Odd</button>
-        <button onclick="checkSchedule('even')">Even</button>
-
-        <h2 id="schedule"></h2>
-    </div>
+    <table>
+        <tr>
+            <th>Day</th>
+            <th>8:00 - 9:15</th>
+            <th>9:15 - 10:30</th>
+            <th>10:30 - 11:45</th>
+            <th>11:45 - 1:00</th>
+            <th>1:00 - 2:30</th>
+            <th>2:30 - 5:00</th>
+        </tr>
+        <tr>
+            <th>Monday</th>
+            <td></td>
+            <td>CSE 4107</td>
+            <td>HUM 4145</td>
+            <td>SWE 4101</td>
+            <td></td>
+            <td id="mon-lab">CSE 4104</td>
+        </tr>
+        <tr>
+            <th>Tuesday</th>
+            <td>CSE 4107</td>
+            <td>SWE 4101</td>
+            <td id="tue-lab1">CSE 4108</td>
+            <td id="tue-lab2">CSE 4108</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>Wednesday</th>
+            <td>Phy 4143</td>
+            <td>HUM 4145</td>
+            <td>HUM 4142</td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th>Thursday</th>
+            <td id="thu-lab1">CSE 4108</td>
+            <td id="thu-lab2">CSE 4108</td>
+            <td>HUM 4147</td>
+            <td>PHY 4143</td>
+            <td></td>
+            <td>MATH 4141</td>
+        </tr>
+        <tr>
+            <th>Friday</th>
+            <td></td>
+            <td>HUM 4147</td>
+            <td>MATH 4141</td>
+            <td>MATH 4141</td>
+            <td></td>
+            <td id="fri-lab">PHY 4144</td>
+        </tr>
+    </table>
 
     <script>
-        const monthNames = ['September', 'October', 'November', 'December', 'January'];
-        const startYear = 2024;
-        const endYear = 2025;
-        const currentDate = new Date();
+        function highlightSchedule(group) {
+            document.querySelectorAll('td').forEach(td => td.classList.remove('highlight'));
+            const startDate = new Date('2024-09-02');
+            const currentDate = new Date();
+            const oneWeek = 7 * 24 * 60 * 60 * 1000;
+            const weeksElapsed = Math.floor((currentDate - startDate) / oneWeek);
+            const isCurrentWeekEven = (weeksElapsed % 2) === 0;
 
-        window.onload = function() {
-            populateYearDropdown();
-            populateMonthDropdown();
-            updateWeeks();
-        };
-
-        function populateYearDropdown() {
-            const yearDropdown = document.getElementById('year');
-            for (let year = startYear; year <= endYear; year++) {
-                const option = document.createElement('option');
-                option.value = year;
-                option.text = year;
-                yearDropdown.appendChild(option);
+            if (group === 'odd') {
+                if (isCurrentWeekEven) {
+                    document.getElementById('mon-lab').classList.add('highlight');
+                } else {
+                    document.getElementById('fri-lab').classList.add('highlight');
+                }
+            } else if (group === 'even') {
+                if (isCurrentWeekEven) {
+                    document.getElementById('fri-lab').classList.add('highlight');
+                } else {
+                    document.getElementById('mon-lab').classList.add('highlight');
+                }
             }
-            yearDropdown.value = currentDate.getFullYear();
-        }
 
-        function populateMonthDropdown() {
-            const monthDropdown = document.getElementById('month');
-            monthNames.forEach((month, index) => {
-                const option = document.createElement('option');
-                option.value = index + 8; // Starting from September (8th month in 0-indexed Date object)
-                option.text = month;
-                monthDropdown.appendChild(option);
-            });
-            monthDropdown.value = currentDate.getMonth(); // Set the current month as default
-        }
-
-        function updateWeeks() {
-            const year = parseInt(document.getElementById('year').value);
-            const month = parseInt(document.getElementById('month').value);
-
-            const weekDropdown = document.getElementById('week');
-            weekDropdown.innerHTML = ''; // Clear previous options
-
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const numWeeks = Math.ceil(daysInMonth / 7);
-
-            for (let week = 1; week <= numWeeks; week++) {
-                const option = document.createElement('option');
-                option.value = week;
-                option.text = `Week ${week}`;
-                weekDropdown.appendChild(option);
+            if (group === 'odd') {
+                document.getElementById('tue-lab1').classList.add('highlight');
+                document.getElementById('tue-lab2').classList.add('highlight');
+            } else if (group === 'even') {
+                document.getElementById('thu-lab1').classList.add('highlight');
+                document.getElementById('thu-lab2').classList.add('highlight');
             }
         }
 
-        function checkSchedule(group) {
-            const month = parseInt(document.getElementById('month').value);
-            const week = parseInt(document.getElementById('week').value);
-
-            // Calculate the consistent days
-            const consistentDay = group === 'odd' ? 'Tuesday' : 'Thursday';
-
-            // Calculate the alternating days (Monday and Friday)
-            const isOddWeek = week % 2 !== 0;
-            let mondayClass = '';
-            let fridayClass = '';
-
-            if (isOddWeek) {
-                mondayClass = group === 'even' ? 'Yes' : 'No';
-                fridayClass = group === 'odd' ? 'Yes' : 'No';
-            } else {
-                mondayClass = group === 'odd' ? 'Yes' : 'No';
-                fridayClass = group === 'even' ? 'Yes' : 'No';
-            }
-
-            const scheduleText = `
-                Your lab schedule for Week ${week} of ${monthNames[month - 8]} ${document.getElementById('year').value}:
-                <ul>
-                    <li>${consistentDay}: Yes</li>
-                    <li>Monday: ${mondayClass}</li>
-                    <li>Friday: ${fridayClass}</li>
-                </ul>
-            `;
-
-            document.getElementById('schedule').innerHTML = scheduleText;
+        function displayCurrentDate() {
+            const date = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = date.toLocaleDateString(undefined, options);
+            document.getElementById('current-date').innerText = formattedDate;
         }
+
+        displayCurrentDate();
     </script>
+
 </body>
 </html>
