@@ -110,13 +110,13 @@
             const weeksElapsed = Math.floor((currentDate - startDate) / oneWeek);
             const isCurrentWeekEven = (weeksElapsed % 2) === 0;
 
-            if (group === 'odd') {
+            if (group === 'even') {
                 if (isCurrentWeekEven) {
                     document.getElementById('mon-lab').classList.add('highlight');
                 } else {
                     document.getElementById('fri-lab').classList.add('highlight');
                 }
-            } else if (group === 'even') {
+            } else if (group === 'odd') {
                 if (isCurrentWeekEven) {
                     document.getElementById('fri-lab').classList.add('highlight');
                 } else {
